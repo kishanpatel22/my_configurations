@@ -1,0 +1,389 @@
+set backupdir=~/vim_tmp
+set cindent
+set dir=~/vim_tmp
+set nobackup
+set nocompatible
+set noswapfile
+set noundofile
+set nowritebackup
+set number
+set smartindent
+set swapfile
+set tags=tags
+set textwidth=80
+set autoread
+filetype plugin indent on
+
+" Commands for quick exit and save
+:command WQ wq
+:command W w
+:command Q q
+:command Wq wq
+
+" Mapping : switch windows in split
+map <C-Right> <C-w>l
+map <C-Left> <C-w>h
+map <C-Up> <C-w>k
+map <C-Down> <C-w>j
+
+set rtp+=/home/kishan/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" Add plugins here
+
+Plugin 'Lokaltog/powerline'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'dracula/vim'
+Plugin 'morhetz/gruvbox'
+Plugin 'scrooloose/nerdtree'
+Plugin 'tpope/vim-fugitive'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'nikvdp/ejs-syntax'
+Plugin 'hail2u/vim-css3-syntax'
+Plugin 'pangloss/vim-javascript'
+
+call vundle#end()
+
+" An example for a vimrc file.
+"
+" Maintainer:	Bram Moolenaar <Bram@vim.org>
+" Last change:	2017 Sep 20
+"
+" To use it, copy it to
+"     for Unix and OS/2:  ~/.vimrc
+"	      for Amiga:  s:.vimrc
+"  for MS-DOS and Win32:  $VIM\_vimrc
+"	    for OpenVMS:  sys$login:.vimrc
+
+" When started as "evim", evim.vim will already have done these settings.
+if v:progname =~? "evim"
+  finish
+endif
+
+" Get the defaults that most users want.
+source $VIMRUNTIME/defaults.vim
+
+if has("vms")
+  set nobackup		" do not keep a backup file, use versions instead
+else
+  set backup		" keep a backup file (restore to previous version)
+  if has('persistent_undo')
+    set undofile	" keep an undo file (undo changes after closing)
+  endif
+endif
+
+if &t_Co > 2 || has("gui_running")
+  " Switch on highlighting the last used search pattern.
+  set hlsearch
+endif
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
+
+  augroup END
+
+else
+
+  set autoindent		" always set autoindenting on
+
+endif " has("autocmd")
+
+" Add optional packages.
+"
+" The matchit plugin makes the % command work better, but it is not backwards
+" compatible.
+" The ! means the package won't be loaded right away but when plugins are
+" loaded during initialization.
+if has('syntax') && has('eval')
+  packadd! matchit
+endif
+
+
+" CSAT coding Guidlines 
+" Loads plugins that supports filetype and the related indent file
+filetype plugin indent on
+" Carry over the current lines indentation
+set autoindent
+" and autoindent if a new scope is entered
+set smartindent
+" Make tab and backspace work on entire indent levels
+set smarttab
+" Set tab and backspace to work on 4 columns
+set softtabstop =4
+" and set actual indent as 4 columns
+set tabstop =4
+" and set the smart / autoindent indent width to 4
+set shiftwidth =4
+" Set the maximum line length
+set textwidth =79
+" and draw a colored column there so that it acts as a guide
+set colorcolumn =79
+" Finally , expand all tabs to spaces
+set expandtab
+
+" Gruvbox configuration 
+let g:airline_theme = "gruvbox"
+set cursorline
+colorscheme gruvbox
+highlight Cursorline cterm=NONE ctermbg=black
+
+set path+=**
+
+" Vim AirLine configurations
+
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_solarized_bg='dark'
+let g:airline_powerline_fonts = 1
+
+" current line cursor command
+set background=dark
+autocmd StdinReadPre * let s:std_in=1
+
+" Function to OPEN HTML webpages
+function Run_HTML()
+    let l:filename = expand('%:t')
+    let l:extension = expand('%:e')
+    if(l:extension == 'html')
+        execute ":!xdg-open " . l:filename
+    else 
+        echo "The file extension is not supported"
+    endif
+endfunction
+
+" Function to RUN C programs
+function Run_C()
+    let l:filename = expand('%:t')
+    let l:extension  = expand('%:e')
+    let l:cflgas = " -lm -Wall "
+    if(l:extension == 'c')
+        execute ":!gcc " . l:filename . l:cflgas . " && " . "./a.out"
+    else 
+        echo "The file extension is not supported"
+    endif
+endfunction
+
+" Function to RUN Python programs
+function Run_Py()
+    let l:filename = expand('%:t')
+    let l:extension = expand('%:e')
+    if(l:extension == 'py')
+        execute ":!./" . l:filename
+    else 
+        echo "The file extension is not supported"
+    endif
+endfunction
+
+" Function to RUN C++ programs
+function Run_Cplusplus()
+    let l:filename = expand('%:t')
+    let l:extension  = expand('%:e')
+    if(l:extension == 'cpp')
+        execute ":!g++ " . l:filename . " && " . "./a.out"
+    else 
+        echo "The file extension is not supported"
+    endif
+endfunction
+
+" Add header guards in the current file
+function Header_guard()
+    let l:name = expand('%:t:r')
+    let l:extension = expand('%:e')
+    execute ":normal! i#ifndef " . l:name . "_" .l:extension
+    execute ":normal g~iw"
+    execute ":normal! o#define " . l:name . "_" . l:extension
+    execute ":normal g~iw"
+    execute ":normal! A 1"
+    execute ":normal! o#endif /* " . l:name . "_" . l:extension . " "
+    execute ":normal hg~iw$"
+    execute ":normal! a*/"
+    execute ":normal! O"
+endfunction
+
+" Running any program using vim
+:command RHTML          execute Run_HTML()
+:command RC             execute Run_C()
+:command RCplusplus     execute Run_Cplusplus()
+:command RPy            execute Run_Py()
+
+
+" Function : copies the skeleton code into file
+" parma[1] : path name to the skeleton code 
+
+function Skeleton_code(path)
+    execute ":r " . a:path
+    execute ":normal ggdd"
+endfunction
+
+" ------------------------- COMPETITIVE PROGRAMMING --------------------------
+
+let cp_path = "~/code/competitive_programing/body/cp_body.cpp"
+:command CP execute Skeleton_code(cp_path)
+
+" ---------------------------- EDIT PYTHON FILES -----------------------------
+
+" Make Python scripts executable when created
+
+" Before writing to a new file set a variable
+autocmd BufWritePre *.py
+    \  if !filereadable(expand('%'))
+    \|   let b:is_new = 1
+    \| endif
+
+" After writing a file use check for its existence
+autocmd BufWritePost *.py 
+    \  if get(b:, 'is_new', 0)
+    \|   silent execute '!chmod +x %'
+    \|   let b:is_new = 0
+    \| endif
+
+" command for creating skeleton body for python scripts 
+
+" 1) Machine Learning 
+let python_ml_path = "~/code/pythonpractice/ML/ML_body.py"
+:command ML execute Skeleton_code(python_ml_path)
+
+" 2) normal scripts 
+let python_path = "~/code/pythonpractice/learn_python/python_body.py" 
+:command Py execute Skeleton_code(python_path)
+
+" ------------------------------- C FILES ------------------------------------
+
+" command for creating skeleton body for c programs
+let c_path = "~/code/cpractice/cprogramming/c_body.c"
+:command C execute Skeleton_code(c_path)
+" add header gaurds in when opened a new header file
+autocmd BufNewFile *.h call Header_guard()
+
+" ------------------------------ CPP FILES -----------------------------------
+
+" command for creating skeleton body for c++ programs
+let cplusplus_path = "~/code/C++_codes/cplusplus/cplusplus_body.cpp"
+:command Cplusplus execute Skeleton_code(cplusplus_path)
+" add header gaurds in when opened a new header file
+autocmd BufNewFile *.hh call Header_guard()
+
+" ------------------------------- HTML FILES ---------------------------------
+
+" file path name where html body content is written 
+let html_body_path = "~/code/web_developement/front_end/HTML_body.html"
+autocmd BufNewFile  *.html execute Skeleton_code(html_body_path)
+:command HTML execute Skeleton_code(html_body_path)
+
+" Function for adding html tags 
+function HTML_tags(outer_tag, inner_tag)
+    execute ":normal! A" . a:outer_tag
+    execute ":normal F<"
+    execute ":normal! i\r"
+    execute ":normal lO" . a:inner_tag
+    execute ":normal F<"
+endfunction
+
+" Variables containg HTML tags
+" tags containing links
+let img_tag         = '<img src="" alt="">'
+let css_link_tag    = '<link rel="stylesheet" type="text/css" href="">'
+let js_script       = '<script type="text/javascript" src=""></script>'
+let anchor_tag      = '<a href=""></a>'
+
+" tags for HTML forms
+let form_tag        = '<form action="" method="" id=""></form>'
+let fieldset_tag    = '<fieldset></fieldset>'
+let legend_tag      = '<legend></legend>'
+let input_tag       = '<input id="" name="" placeholder="" type="">'
+let label_tag       = '<label for="" ></label>'
+let button_tag      = '<button type=""></button>'
+
+" tags for HTML Table 
+let table_tag       = '<table></table>'
+let th_tag          = '<th></th>'
+let tr_tag          = '<tr></tr>'
+let td_tag          = '<td></td>'
+
+" tags for HTML list
+let ul_tag          = '<ul></ul>'
+let ol_tag          = '<ol></ol>'
+let li_tag          = '<li></li>'
+
+" tags for headings
+let h1_tag          = '<h1 style="text-align:center"></h1>'
+let h2_tag          = '<h2 style="text-align:center"></h2>'
+let h3_tag          = '<h3 style="text-align:center"></h3>'
+let h4_tag          = '<h4 style="text-align:center"></h4>'
+let h5_tag          = '<h5 style="text-align:center"></h5>'
+let h6_tag          = '<h6 style="text-align:center"></h6>'
+
+
+" One liner HTML tags
+" Mappings for linker tags for images, scripts, css, js and urls
+:map ,img       :execute "normal! A" . img_tag          <CR>:execute "normal ^10l"<CR>
+:map ,css       :execute "normal! A" . css_link_tag     <CR>:execute "normal $h"  <CR>
+:map ,js        :execute "normal! A" . js_script        <CR>:execute "normal $F<" <CR>
+:map ,an        :execute "normal! A" . anchor_tag       <CR>:execute 'normal $F"' <CR>
+" Mappings for HTML forms
+:map ,ip        :execute "normal! A" . input_tag        <CR>:execute "normal $F<" <CR>
+:map ,leg       :execute "normal! A" . legend_tag       <CR>:execute "normal $F<" <CR>
+:map ,lab       :execute "normal! A" . label_tag        <CR>:execute "normal $F<" <CR>
+:map ,but       :execute "normal! A" . button_tag       <CR>:execute "normal $F<" <CR>
+" Mapping for HTML tables and list
+:map ,tab       :execute "normal! A" . table_tag        <CR>:execute "normal $F<" <CR>
+:map ,li        :execute "normal! A" . li_tag           <CR>:execute "normal $F<" <CR>
+" Mappings for nested HTML tags
+:map ,form      :call HTML_tags(form_tag, fieldset_tag) <CR>
+:map ,ul        :call HTML_tags(ul_tag, li_tag)         <CR>
+:map ,ol        :call HTML_tags(ol_tag, li_tag)         <CR>
+:map ,tr        :call HTML_tags(tr_tag, td_tag)         <CR>
+:map ,th        :call HTML_tags(th_tag, td_tag)         <CR>
+" Mappings for heading HTML tags
+:map ,h1        :execute "normal! A" . h1_tag           <CR>:execute "normal $F<" <CR>
+:map ,h2        :execute "normal! A" . h2_tag           <CR>:execute "normal $F<" <CR>
+:map ,h3        :execute "normal! A" . h3_tag           <CR>:execute "normal $F<" <CR>
+:map ,h4        :execute "normal! A" . h4_tag           <CR>:execute "normal $F<" <CR>
+:map ,h5        :execute "normal! A" . h5_tag           <CR>:execute "normal $F<" <CR>
+:map ,h6        :execute "normal! A" . h6_tag           <CR>:execute "normal $F<" <CR>
+
+
+
+"------------------------------- BASH SCRIPTS --------------------------------
+" Before writing to a new file set a variable
+autocmd BufWritePre *.sh
+    \  if !filereadable(expand('%'))
+    \|   let b:is_new = 1
+    \| endif
+
+" After writing a file use check for its existence
+autocmd BufWritePost *.sh
+    \  if get(b:, 'is_new', 0)
+    \|   silent execute '!chmod +x %'
+    \|   let b:is_new = 0
+    \| endif
+
+"------------------------------- NodeJS SERVER -------------------------------
+
+" command for creating sever in nodejs
+let server_body_path = "~/code/web/back_end/NODE_JS/JS_body/server_body.js"
+:command NodeJS execute Skeleton_code(server_body_path)
+au BufNewFile,BufRead *.ejs set filetype=html
+
+
+"---------------------------------- LaTeX ------------------------------------
+
+" command for creating a LaTeX file 
+let LaTeX_body_path = "~/code/LaTeX/learn_Latex/body.tex"
+:command LaTeX execute Skeleton_code(LaTeX_body_path)
+
+
+
+
+
+
+
