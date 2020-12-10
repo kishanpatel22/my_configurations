@@ -44,6 +44,7 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'nikvdp/ejs-syntax'
 Plugin 'hail2u/vim-css3-syntax'
 Plugin 'pangloss/vim-javascript'
+Plugin 'artur-shaik/vim-javacomplete2'
 
 call vundle#end()
 
@@ -162,22 +163,35 @@ endfunction
 
 " Function to RUN C programs
 function Run_C()
-    let l:filename = expand('%:t')
+    let l:filename = expand('%:r')
     let l:extension  = expand('%:e')
     let l:cflgas = " -lm -Wall "
     if(l:extension == 'c')
-        execute ":!gcc " . l:filename . l:cflgas . " && " . "./a.out"
+        execute ":!gcc " . l:filename . ".c" . l:cflgas . " && ./a.out"
     else 
         echo "The file extension is not supported"
     endif
 endfunction
 
+
+" Function to RUN Java programs
+function Run_Java()
+    let l:filename = expand('%:r')
+    let l:extension  = expand('%:e')
+    if(l:extension == 'java')
+        execute ":!javac " . l:filename . ".java" ." && java " . l:filename 
+    else 
+        echo "The file extension is not supported"
+    endif
+endfunction
+
+
 " Function to RUN Python programs
 function Run_Py()
-    let l:filename = expand('%:t')
+    let l:filename = expand('%:r')
     let l:extension = expand('%:e')
     if(l:extension == 'py')
-        execute ":!./" . l:filename
+        execute ":! python3 " . l:filename . ".py"
     else 
         echo "The file extension is not supported"
     endif
@@ -185,10 +199,10 @@ endfunction
 
 " Function to RUN C++ programs
 function Run_Cplusplus()
-    let l:filename = expand('%:t')
+    let l:filename = expand('%:r')
     let l:extension  = expand('%:e')
     if(l:extension == 'cpp')
-        execute ":!g++ " . l:filename . " && " . "./a.out"
+        execute ":!g++ " . l:filename . ".cpp" . " && " . "./a.out"
     else 
         echo "The file extension is not supported"
     endif
@@ -214,6 +228,7 @@ endfunction
 :command RC             execute Run_C()
 :command RCplusplus     execute Run_Cplusplus()
 :command RPy            execute Run_Py()
+:command RJava          execute Run_Java()
 
 
 " Function : copies the skeleton code into file
@@ -381,9 +396,24 @@ au BufNewFile,BufRead *.ejs set filetype=html
 let LaTeX_body_path = "~/code/LaTeX/learn_Latex/body.tex"
 :command LaTeX execute Skeleton_code(LaTeX_body_path)
 
+"-----------------------------------Java--------------------------------------
 
+autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
+" Function : Initializes java file
+" parma[1] : path name to the skeleton code 
 
+function JavaInit(java_path)
+    let l:name = expand('%:t:r')
+    execute ":r " . a:java_path
+    execute ":normal ggdd2wdw"
+    execute ":normal i" . l:name . " " 
+endfunction
 
+" command for creating the java file 
+:command Java execute JavaInit(java_path)
 
+" by default set the code for java files
+let java_path = "~/code/Java/body/JavaBody.java"
+autocmd BufNewFile  *.java execute JavaInit(java_path)
 
